@@ -137,7 +137,7 @@ class UserInfo:
             theme=self.page.ele('tag:span@class=css-14pe3hg').text
             date=self.page.ele('tag:span@class=css-w2z2xi').text
             box_div=self.page.eles('tag:div@class=css-fiugn9')
-            wo=box_div[0].eles("tag:div@class= css-1ej260s")
+            wo=box_div[0].eles("tag:div@class: css-1ej260s")
             logger.info(f"主题: {theme}")
             logger.info(f"活动时间: {date} ")
             logger.info(f"单词长度: {len(wo)}")
@@ -209,9 +209,10 @@ class UserInfo:
             str_word=list(word)
             for i in str_word:
                 #点击单词
-                button=self.page.eles(f'tag:button@class= css-wrg6pl').filter_one.text(f"{i}")
+                button=self.page.eles(f'tag:button@class: css-wrg6pl').filter_one.text(f"{i}")
                 button.click()
-            
+                
+            time.sleep(0.5)
             self.page.ele('tag:button@class= css-i4rvme').click()
             return True
         except Exception as e:
