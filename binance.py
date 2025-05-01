@@ -84,7 +84,7 @@ class UserInfo:
             # 跳转到奖励中心页面
             self.page.get("https://www.binance.com/zh-CN/rewards-hub")
             time.sleep(2)
-            sign_button=self.page.ele('tag:button@aria-label=签到')
+            sign_button=self.page.ele('tag:button@text()=签到')
             
             if "disabled" in sign_button.attrs:
                 logger.info(f"签到: 今日已签到")
