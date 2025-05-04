@@ -101,6 +101,21 @@ class UserInfo:
             return True
         except Exception as e:
             logging.info(f"签到错误: \n{e}")
+            return 
+        
+    def reward_week(self):
+        try:
+            logger.info("正在查询连续签到情况...")
+            # 跳转到奖励中心页面
+            self.page.get("https://www.binance.com/zh-CN/rewards-hub")
+            time.sleep(2)
+            self.page.ele('tag:button@class:ClaimBigRewardButton DailyCheckIn-Footer-ClaimBigRewardButton').click()
+            logger.info("您已签到满7天，额外获得10积分!")
+            point=self.page.ele('tag:div@class=HomeBannerSummaryItem-data').text
+            logger.info(f"积分: {point}")
+            return True
+        except Exception as e:
+            logging.info(f"签到天数不足，无法领取额外10积分奖励")
             return False
         
     def wotd(self):
@@ -228,6 +243,8 @@ class UserInfo:
             logger.info("执行任务失败，请先完成 KYC 身份验证")
             self.push_content += "执行任务失败，请先完成 KYC 身份验证"
             return
+        
+        self.reward_week()
 
         if not self.into_wotd():
             logger.info("进入 WOTD 失败")
