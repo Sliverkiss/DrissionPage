@@ -66,6 +66,30 @@ class UserInfo:
             print("Bark 推送内容:", self.push_content)
         except Exception as e:
             print("Bark 推送失败:", str(e))
+            
+    def login(self,count=0):
+        try:
+            self.page.get("https://accounts.binance.com/zh-CN/login/password")
+            time.sleep(2)
+            #输入用户名
+            self.page.ele('tag:input@name=username').input(self.username)
+            time.sleep(2)
+            self.page.ele('@text()=下一步').click()
+            time.sleep(2)
+            self.page.get("https://accounts.binance.com/zh-CN/login/password")
+            time.sleep(2)
+            self.page.ele('tag:input@name=password').input(self.password)
+            self.page.ele('@text()=下一步').click()
+            if self.page.ele('@text()=我的通行密钥无法使用').click():
+                logging.info(f"登录成功！")
+                self.push_content += f"登录成功！\n"
+                return True
+            else:
+                logging.info(f"登录失败！")
+        except Exception as e:
+            logging.info(f"登录错误: {e}")
+            self.push_content += f"登录错误: {e}\n"
+            return False
     
     def get_user_info(self):
         try:
@@ -105,14 +129,11 @@ class UserInfo:
         
     def reward_week(self):
         try:
-            logger.info("正在查询连续签到情况...")
             # 跳转到奖励中心页面
             self.page.get("https://www.binance.com/zh-CN/rewards-hub")
             time.sleep(2)
             self.page.ele('tag:button@class:ClaimBigRewardButton DailyCheckIn-Footer-ClaimBigRewardButton').click()
-            logger.info("您已签到满7天，额外获得10积分!")
             point=self.page.ele('tag:div@class=HomeBannerSummaryItem-data').text
-            logger.info(f"积分: {point}")
             return True
         except Exception as e:
             logging.info(f"签到天数不足，无法领取额外10积分奖励")
@@ -122,9 +143,9 @@ class UserInfo:
         try:
             logger.info("开始执行每日一词任务")
             #打开每日一词网站，获取数据
-            self.page.get("https://wotd-ten.vercel.app")
-            logger.info("🔍 正在查询词库数据，请稍等...")
-            time.sleep(2)
+            self.page.get("https://artru.net/zh/dap-an-binance-wotd-word-of-the-day/")
+            logger.info("🔍 正在查询词库数据，请稍等30秒加载cache...")
+            time.sleep(30)
             iframe=self.page.get_frame("tag:iframe@title=币安 WOTD 答案 - 每日一词")
             words=iframe.eles('tag:p')
             
@@ -237,7 +258,10 @@ class UserInfo:
     def run(self):
         if not self.get_user_info():
             self.push_content += "登录失败，账号已掉线"
-            return
+            if not self.login():
+                return
+            else:
+               self.get_user_info() 
 
         if not self.reward_signin():
             logger.info("执行任务失败，请先完成 KYC 身份验证")
