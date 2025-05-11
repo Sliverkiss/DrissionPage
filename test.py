@@ -1,5 +1,4 @@
 from DrissionPage import ChromiumPage, ChromiumOptions
-from config import Config
 
 co = ChromiumOptions()
 co.headless(True)
